@@ -1,88 +1,59 @@
 #!/bin/bash
 
+#requires openmpi to be installed already!!
+
 # Function to check if a command is available and install it if not
 check_and_install_command() {
     local package_name="$1"
     if ! command -v "$package_name" &>/dev/null; then
         echo "$package_name not found, attempting to install..."
-        if [[ "$package_manager" == "apt-get" ]]; then
-            apt-get update || { echo "Failed to update package lists. Exiting."; exit 1; }
-            apt-get install -y "$package_name" || { echo "Failed to install $package_name. Exiting."; exit 1; }
-        elif [[ "$package_manager" == "yum" ]]; then
-            yum install -y "$package_name" || { echo "Failed to install $package_name. Exiting."; exit 1; }
-        fi
+        apt-get update || { echo "Failed to update package lists. Exiting."; exit 1; }
+        apt-get install -y "$package_name" || { echo "Failed to install $package_name. Exiting."; exit 1; }
     else
         echo "$package_name is already installed"
     fi
 }
 
-# Function to install math libraries from pre-built packages (assuming they are available)
-install_math_libraries() {
-    echo "Installing math libraries (BLAS, LAPACK, and ScaLAPACK) ..."
+# Function to install a package from source if not already installed
+install_from_source() {
+    local package_name="$1"
+    local source_url="$2"
+    local source_dir="$3"
 
-    if [[ "$package_manager" == "apt-get" ]]; then
-        apt-get update || { echo "Failed to update package lists. Exiting."; exit 1; }
-        apt-get install -y libopenblas-dev liblapack-dev libscalapack-mpi-dev || { echo "Failed to install math libraries. Exiting."; exit 1; }
-    elif [[ "$package_manager" == "yum" ]]; then
-        yum install -y epel-release || { echo "Failed to install EPEL repository. Exiting."; exit 1; }
-        yum install -y openblas-devel lapack-devel scalapack-openmpi-devel || { echo "Failed to install math libraries. Exiting."; exit 1; }
+    if [ ! -d "$source_dir" ]; then
+        echo "Cloning $package_name from $source_url..."
+        git clone "$source_url" "$source_dir" || { echo "Failed to clone $package_name. Exiting."; exit 1; }
+    else
+        echo "$package_name source code already exists"
     fi
 
-    echo "Math libraries installation complete."
+    cd "$source_dir"
+    mkdir build
+    cd build
+    cmake ..
+    make
+    make install
+    cd ../..
 }
 
-# Function to check if a command exists
-command_exists() {
-    command -v "$1" &>/dev/null
-}
+# Install required packages
+check_and_install_command "git"
+check_and_install_command "cmake"
+check_and_install_command "gfortran"
 
-# Function to check if the math libraries are installed
-check_math_libraries() {
-    echo "Checking if math libraries (BLAS, LAPACK, and ScaLAPACK) are installed..."
+# Install OpenBLAS
+install_from_source "OpenBLAS" "https://github.com/xianyi/OpenBLAS.git" "OpenBLAS"
 
-    if [[ -n $(ldconfig -p | grep libblas) ]]; then
-        echo "BLAS is installed."
-    else
-        echo "BLAS is not installed."
-    fi
+# Install LAPACK
+install_from_source "LAPACK" "https://github.com/Reference-LAPACK/lapack.git" "lapack"
 
-    if [[ -n $(ldconfig -p | grep liblapack) ]]; then
-        echo "LAPACK is installed."
-    else
-        echo "LAPACK is not installed."
-    fi
+# Install ScaLAPACK
+install_from_source "ScaLAPACK" "https://github.com/Reference-ScaLAPACK/scalapack.git" "scalapack"
 
-    if [[ -n $(ldconfig -p | grep libscalapack) ]]; then
-        echo "ScaLAPACK is installed."
-    else
-        echo "ScaLAPACK is not installed."
-    fi
+# Print paths where the math libraries are installed
+echo "Paths where the math libraries are installed:"
+find /usr/local -name "libblas*"
+find /usr/local -name "liblapack*"
+find /usr/local -name "libscalapack*"
 
-   # Display the paths where the math libraries are installed
-   echo "Paths where the math libraries are installed:"
-   ldconfig -p | grep libblas
-   ldconfig -p | grep liblapack
-   ldconfig -p | grep libscalapack 
-}
-
-# Main script
-# Detect the package manager available on the system
-if command_exists apt-get; then
-    package_manager="apt-get"
-elif command_exists yum; then
-    package_manager="yum"
-else
-    echo "Error: No supported package manager found (neither apt-get nor yum). Unable to install math libraries. Exiting."
-    exit 1
-fi
-
-# Install dependencies
-check_and_install_command "wget"
-check_and_install_command "ssh"
-check_and_install_command "tar"
-
-# Install math libraries
-install_math_libraries
-
-# Check if math libraries are installed correctly
-check_math_libraries
+echo "Installation of LAPACK, ScaLAPACK, and OpenBLAS is complete."
