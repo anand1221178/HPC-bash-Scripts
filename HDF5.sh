@@ -30,7 +30,7 @@ read INSTALL_DIR
 if [ -z "$INSTALL_DIR" ]; then
     ./configure
 else
-    ./configure --prefix="$INSTALL_DIR"
+    ./configure --prefix="$INSTALL_DIR" --with-szip=/root/szip-2.1.1 --with-zlib=/root/zlib/
 fi
 
 # Step 6: Compile the code
