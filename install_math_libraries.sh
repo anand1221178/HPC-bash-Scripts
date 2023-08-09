@@ -50,6 +50,11 @@ install_from_source "LAPACK" "https://github.com/Reference-LAPACK/lapack.git" "l
 # Install ScaLAPACK
 install_from_source "ScaLAPACK" "https://github.com/Reference-ScaLAPACK/scalapack.git" "scalapack"
 
+# Update PATH and LD_LIBRARY_PATH in ~/.bashrc
+echo "export PATH=\"/usr/local/bin:\$PATH\"" >> ~/.bashrc
+echo "export LD_LIBRARY_PATH=\"/usr/local/lib:\$LD_LIBRARY_PATH\"" >> ~/.bashrc
+source ~/.bashrc
+
 # Print paths where the math libraries are installed
 echo "Paths where the math libraries are installed:"
 find /usr/local -name "libblas*"
