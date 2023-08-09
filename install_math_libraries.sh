@@ -1,6 +1,7 @@
 #!/bin/bash
 
-#requires openmpi to be installed already!!
+#scalapack requires MPI to be installed already 
+#installs gfortran via apt if gcc was not installed previously (run install_gcc.sh before executing this script!!) 
 
 # Function to check if a command is available and install it if not
 check_and_install_command() {
@@ -13,6 +14,10 @@ check_and_install_command() {
         echo "$package_name is already installed"
     fi
 }
+
+# Install required packages
+check_and_install_command "git"
+check_and_install_command "cmake"
 
 # Function to install a package from source if not already installed
 install_from_source() {
@@ -36,10 +41,9 @@ install_from_source() {
     cd ../..
 }
 
-# Install required packages
-check_and_install_command "git"
-check_and_install_command "cmake"
+# Install gfortran and openmpi if not installed via other means 
 check_and_install_command "gfortran"
+check_and_install_command "openmpi"
 
 # Install OpenBLAS
 install_from_source "OpenBLAS" "https://github.com/xianyi/OpenBLAS.git" "OpenBLAS"
@@ -50,8 +54,7 @@ install_from_source "LAPACK" "https://github.com/Reference-LAPACK/lapack.git" "l
 # Install ScaLAPACK
 install_from_source "ScaLAPACK" "https://github.com/Reference-ScaLAPACK/scalapack.git" "scalapack"
 
-# Update PATH and LD_LIBRARY_PATH in ~/.bashrc
-echo "export PATH=\"/usr/local/bin:\$PATH\"" >> ~/.bashrc
+# Update PATH and LD_LIBRARY_PATH for the math libraries
 echo "export LD_LIBRARY_PATH=\"/usr/local/lib:\$LD_LIBRARY_PATH\"" >> ~/.bashrc
 source ~/.bashrc
 
@@ -61,4 +64,4 @@ find /usr/local -name "libblas*"
 find /usr/local -name "liblapack*"
 find /usr/local -name "libscalapack*"
 
-echo "Installation of LAPACK, ScaLAPACK, and OpenBLAS is complete."
+echo "Installation of gfortran and math libraries is complete."
