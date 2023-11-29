@@ -15,9 +15,10 @@ cd /tmp
 wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.2.tar.gz
 tar -xzvf openmpi-4.1.2.tar.gz
 cd openmpi-4.1.2
+#to install other version the line below must be changed, eg. /home/benchmarks/openmpi-2.1
 ./configure --prefix=/home/benchmarks/openmpi
 make -j$(nproc)
-sudo make install
+sudo make all install
 
 # Add Open MPI to the PATH for the current user
 export PATH=/home/benchmarks/openmpi/bin:$PATH
@@ -25,6 +26,9 @@ export PATH=/home/benchmarks/openmpi/bin:$PATH
 # Add Open MPI to the LD_LIBRARY_PATH for the current user
 export LD_LIBRARY_PATH=/home/benchmarks/openmpi/lib:$LD_LIBRARY_PATH
 
+#Activate resource file
+source $HOME/.bashrc
+
 # Verify installation
-mpicc --version
+mpirun --version
                   
