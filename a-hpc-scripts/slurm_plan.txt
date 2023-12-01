@@ -1,0 +1,43 @@
+#update hosts at sudo nano /etc/hosts
+#hnode
+192.168.1.1 hnode
+192.168.1.2 hnode
+192.168.1.10 cnode1
+192.168.1.11 cnode2
+
+#cnode1
+192.168.1.1 hnode
+192.168.1.10 cnode1
+192.168.1.11 cnode2
+
+#cnode2
+192.168.1.2 hnode
+192.168.1.10 cnode1
+192.168.1.11 cnode2
+
+#setup munge
+
+
+#setup_slurm
+#hnode
+sudo apt-get install slurm-wlm
+#modify sudo nano /etc/slurm/slurm.conf
+sudo systemctl start slurmctld
+
+#cnode1, cnode2
+sudo apt-get install slurm-wlm
+#modify sudo nano /etc/slurm/slurm.conf
+sudo systemctl start slurmd
+sinfo
+srun hnode
+
+#add to #modify sudo nano /etc/slurm/slurm.conf
+ClusterName=cluster
+ControlMachine=witsa
+NodeName=hnode CPUs=12 CoresPerSocket=6 ThreadsPerCore=2 State=idle
+NodeName=cnode1 CPUs=24 Sockets=2 CoresPerSocket=6 ThreadsPerCore=2 State=idle
+NodeName=cnode2 CPUs=12 Boards=1 SocketsPerBoard=2 CoresPerSocket=6 ThreadsPerCore=1 State=idle
+
+PartitionName=debug Nodes=ALL Default=YES MaxTime=INFINITE State=UP
+
+

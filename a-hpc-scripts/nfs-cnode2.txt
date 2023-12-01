@@ -1,0 +1,11 @@
+#nfs
+sudo apt-get install nfs-common
+sudo mkdir /mnt/shared_data
+sudo mount headnode_ip:/shared_data /mnt/shared_data
+
+sudo nano /etc/fstab
+sudo mount -a
+sudo mount -o hard,vers=4.2 192.168.1.10:/nfs_share /mnt/nfs_share
+echo '192.168.1.10:/nfs_share /mnt/nfs_share nfs defaults 0 0' | sudo tee -a /etc/fstab
+
+

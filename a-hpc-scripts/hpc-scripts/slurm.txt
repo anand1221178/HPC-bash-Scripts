@@ -1,0 +1,3 @@
+
+sbatch --job-name=compile_job --output=compile_output.txt --error=compile_error.txt --nodes=1 --cpus-per-task=4 --mem=8G --make=/path/to/your/source/code
+

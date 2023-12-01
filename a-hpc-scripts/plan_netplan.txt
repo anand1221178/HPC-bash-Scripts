@@ -1,0 +1,63 @@
+#hnode
+network:
+  version: 2
+  ethernets:
+    enp8s0f0:  # SFP+ connection to cnode1
+      addresses: [192.168.1.1/24]
+
+    enp8s0f1:  # SFP+ connection to cnode2
+      addresses: [192.168.1.2/24]
+
+    enp8s0f2:  # External/internet-facing interface
+      dhcp4: true
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]
+
+#cnode1
+network:
+  version: 2
+  ethernets:
+    enp8s0f0:  # SFP+ connection to hnode
+      addresses: [192.168.1.10/24]
+      gateway4: 192.168.1.1
+
+#cnode2
+network:
+  version: 2
+  ethernets:
+    enp8s0f0:  # SFP+ connection to hnode
+      addresses: [192.168.1.11/24]
+      gateway4: 192.168.1.2
+
+->sudo netplan apply, for all netplans, then try and ping
+
+
+#internet
+sudo nano /etc/sysctl.conf
+net.ipv4.ip_forward=1
+sudo sysctl -p
+sudo iptables -t nat -A POSTROUTING -o enp8s0f2 -j MASQUERADE
+sudo apt-get install iptables-persistent
+
+#on hnode
+ssh-keygen -t rsa
+ssh-copy-id -i ~/.ssh/id_rsa.pub witsa@192.168.1.10  # For cnode1
+ssh-copy-id -i ~/.ssh/id_rsa.pub witsa@192.168.1.11  # For cnode2
+
+#try
+ping 192.168.1.10  # From hnode to cnode1
+ping 192.168.1.11  # From hnode to cnode2
+
+ssh witsa@192.168.1.10  # From hnode to cnode1
+ssh witsa@192.168.1.11  # From hnode to cnode2
+
+#on each node
+#add to sudo nano /etc/ssh/sshd_config 
+PermitRootLogin yes
+X11Forwarding yes
+
+sudo systemctl restart ssh
+
+
+
+

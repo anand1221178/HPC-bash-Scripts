@@ -1,0 +1,32 @@
+#hnode
+sudo apt-get install nfs-kernel-server
+sudo mkdir -p /srv/nfs/share
+sudo chown nobody:nogroup /srv/nfs/share
+sudo chmod 777 /srv/nfs/share
+
+sudo nano /etc/exports
+/srv/nfs/share 192.168.1.0/24(rw,sync,no_subtree_check) #/nfs_share 192.168.1.11(rw,sync,no_root_squash) 192.168.3.12(rw,sync,no_root_squash)
+
+sudo systemctl restart nfs-kernel-server
+
+#cnode1
+sudo apt-get install nfs-common
+sudo mkdir -p /mnt/nfs-share
+sudo mount -t nfs hnode:/srv/nfs/share /mnt/nfs-share 
+df -h #verifies the mount
+#auto mount at boot
+sudo nano /etc/fstab
+192.168.1.1:/srv/nfs/share /mnt/nfs-share nfs defaults 0 0 # hnode:/srv/nfs/share /mnt/nfs_share nfs hard,vers=4.2 0 0
+
+#cnode2
+sudo apt-get install nfs-common
+sudo mkdir -p /mnt/nfs-share
+sudo mount -t nfs hnode:/srv/nfs/share /mnt/nfs-share 
+df -h #verifies the mount
+#auto mount at boot
+sudo nano /etc/fstab
+192.168.1.2:/srv/nfs/share /mnt/nfs-share nfs defaults 0 0 # hnode:/srv/nfs/share /mnt/nfs_share nfs hard,vers=4.2 0 0
+
+
+
+

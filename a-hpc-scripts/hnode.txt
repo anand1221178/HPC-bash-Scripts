@@ -1,0 +1,54 @@
+#first
+nslookup google.com
+curl -O https://google.com
+
+#zerotier
+sudo ufw disable, sudo ufw status
+sudo apt update
+sudo apt install zerotier-one, or  curl -s "https://install.zerotier.com" | sudo bash
+sudo zerotier-cli join 363c67c55a642218 #db64858fedb152bc
+
+sudo zerotier-cli status
+sudo zerotier-cli listnetworks #to get public ip to loginto
+
+
+#before
+sudo apt install openssh-server
+sudo systemctl restart systemd-networkd
+sudo systemd-resolve --flush-caches #to flush cache
+systemctl status systemd-resolved
+
+ip a #ip table
+ip route #routing tables
+
+#check internet access
+ip link show
+ip route show, should have 0.0.0.0
+nslookup google.com
+
+
+# Forwarding rules for internal network (adjust network interface names)
+iptables -A FORWARD -i enp8s0f1 -o enp8s0f0 -j ACCEPT
+iptables -A FORWARD -i enp8s0f0 -o enp8s0f1 -j ACCEPT
+
+
+# Network Address Translation (NAT) for internet sharing
+iptables -t nat -A POSTROUTING -o enp8s0f0 -j MASQUERADE
+
+
+#netplan
+network:
+  version: 2
+  ethernets:
+    enp8s0f0:  # The internal interface for connecting to compute nodes
+      addresses: [192.168.1.10/24]
+      routes:
+        - to: 192.168.3.0/24
+          via: 192.168.1.11
+
+    enp8s0f1:  # The external/internet-facing interface
+      dhcp4: true  
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4] 
+
+
