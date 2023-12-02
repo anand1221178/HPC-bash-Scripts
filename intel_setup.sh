@@ -1,4 +1,4 @@
-#!bin/env bash
+#!/bin/env bash
 #This script will download the intel oneapi base toolkit and extract it and the oneapi hpc toolkit and extract it
 # exit when any command fails
 set -e
