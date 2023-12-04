@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #scalapack requires MPI to be installed already 
-#installs gfortran via apt if gcc was not installed previously (run install_gcc.sh before executing this script!!) 
+#installs gfortran via apt if gcc was not installed previously (run install_gcc.sh before executing this script!!) m
 
 # Function to check if a command is available and install it if not
 check_and_install_command() {
