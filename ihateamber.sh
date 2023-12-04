@@ -13,6 +13,9 @@ tar -xvjf Amber22.tar.bz2
 cd amber22_src
 
 cd build
+#CHANGE TO INTEL IN ./run_cmake
+
+
 #source /nfs_share/intel/setvars.sh (load modules
 ml Core/lmod/6.6
 ml Core/settarg/6.6
